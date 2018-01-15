@@ -39,18 +39,32 @@ $("#submit-button").on("click", function(event) {
 
 database.ref().on("child_added", function(childSnapshot) {
 
-    let currenttrainName = childSnapshot.val().trainName;
-    let currentDestination = childSnapshot.val().destination;
-    let currentstartingTime = childSnapshot.val().startingTime;
-    let currentFrequency = childSnapshot.val().frequency;
+    trainName = childSnapshot.val().trainName;
+    destination = childSnapshot.val().destination;
+    startingTime = childSnapshot.val().startingTime;
+    frequency = childSnapshot.val().frequency;
 
-    var newRow =
-    `<tr>
-        <td>${currenttrainName}</td>
-        <td>${currentDestination}</td>
-        <td>${currentFrequency}</td>
-    </tr>`
-    
-    $("#train-table").prepend(newRow);
-    
-})
+    nextTrainFinder();
+
+});
+
+nextTrainFinder = function() {
+    var startTime = moment(startingTime, "HH:mm");
+    var currentTime = moment();
+    while (startTime < currentTime) {
+        startTime.add(frequency, 'minutes')
+        if(startTime > currentTime) {
+            var minutesRemaining = startTime.diff(currentTime, 'minutes');
+            var newRow =
+                `<tr>
+                <td>${trainName}</td>
+                <td>${destination}</td>
+                <td>${frequency} min</td>
+                <td>${startTime.format("hh:mm a")}</td>
+                <td>${minutesRemaining} min</td>
+                </tr>`
+
+            $("#train-table").prepend(newRow);
+        }
+    }
+}
